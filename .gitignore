@@ -1,0 +1,10 @@
+# Binaries
+agy-voice-server
+*.exe
+*.dll
+*.so
+*.dylib
+
+# OS files
+.DS_Store
+Thumbs.db

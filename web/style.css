@@ -1,0 +1,402 @@
+:root {
+  --bg: #0d1117;
+  --panel: #161b22;
+  --border: #30363d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --accent: #2f81f7;
+  --accent-active: #1f6feb;
+  --green: #3fb950;
+  --danger: #f85149;
+  --warn: #d29922;
+  --btn-bg: #21262d;
+  --btn-active: #30363d;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 1. Top Action Bar */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 6px 8px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  font-weight: 600;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.top-left {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.folder-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--btn-bg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%238b949e' d='M1 1l4 4 4-4' stroke='%238b949e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill-opacity='0'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 7px center;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 5px 22px 5px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  min-width: 72px;
+  max-width: 180px;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  touch-action: manipulation;
+  outline: none;
+}
+
+.folder-select:focus {
+  border-color: var(--accent);
+}
+
+.folder-select:disabled {
+  opacity: 0.5;
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.top-btn {
+  border-radius: 7px;
+  padding: 5px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  cursor: pointer;
+  touch-action: manipulation;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity 0.1s ease, transform 0.05s ease;
+}
+
+.top-btn:active {
+  opacity: 0.8;
+  transform: translateY(1px);
+}
+
+.top-btn:disabled {
+  opacity: 0.5;
+}
+
+.interrupt-btn {
+  background: #2d1a1f;
+  color: #ff7b72;
+  border: 1px solid #f85149;
+}
+
+.send-now-btn {
+  background: #1f3526;
+  color: #7ee787;
+  border: 1px solid #2ea043;
+}
+
+.clear-btn {
+  background: #21262d;
+  color: #c9d1d9;
+  border: 1px solid var(--border);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.restart-btn {
+  background: #2d2315;
+  color: #f0883e;
+  border: 1px solid #d29922;
+}
+
+@media (max-width: 420px) {
+  .top-btn {
+    padding: 4px 6px;
+    font-size: 11px;
+  }
+  .folder-select {
+    padding: 4px 18px 4px 6px;
+    font-size: 11px;
+    max-width: 135px;
+    background-position: right 5px center;
+  }
+}
+
+/* 2. Live Same-Origin ttyd Terminal View */
+.terminal-wrap {
+  flex: 1 1 auto;
+  width: 100%;
+  position: relative;
+  background: #000;
+  overflow: hidden;
+  touch-action: none;
+}
+
+#ttyd-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+.scroll-bottom-btn {
+  position: absolute;
+  bottom: 12px;
+  right: 14px;
+  background: rgba(33, 38, 45, 0.94);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.1s ease;
+  z-index: 25;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.scroll-bottom-btn.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.scroll-bottom-btn:active {
+  background: var(--btn-active);
+  transform: translateY(1px);
+}
+
+.toast {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(22, 27, 34, 0.92);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  z-index: 20;
+  white-space: nowrap;
+}
+
+.toast.visible {
+  opacity: 1;
+}
+
+/* 3. Navigation & Action Bar */
+.nav-bar {
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px)) 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.nav-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 42px;
+  background: var(--btn-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color 0.1s ease, border-color 0.1s ease, transform 0.05s ease;
+}
+
+.nav-btn:active {
+  background: var(--btn-active);
+  border-color: var(--accent);
+  transform: translateY(1px);
+}
+
+.nav-btn.slash-btn {
+  color: #58a6ff;
+  border-color: rgba(56, 139, 253, 0.45);
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.nav-btn.tab-btn {
+  color: #7ee787;
+  border-color: rgba(63, 185, 80, 0.35);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.nav-btn.esc-btn {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.nav-btn.arrow-btn {
+  color: #f0f6fc;
+  font-size: 18px;
+}
+
+.nav-btn.enter-btn {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.nav-btn.enter-btn:active {
+  background: var(--accent-active);
+  border-color: var(--accent-active);
+}
+
+@media (max-height: 520px) {
+  .nav-bar {
+    padding: 4px 4px calc(4px + env(safe-area-inset-bottom, 0px)) 4px;
+    gap: 3px;
+  }
+  .nav-btn {
+    height: 34px;
+    font-size: 15px;
+  }
+  .nav-btn.slash-btn,
+  .nav-btn.enter-btn {
+    font-size: 16px;
+  }
+  .nav-btn.tab-btn,
+  .nav-btn.esc-btn {
+    font-size: 10px;
+  }
+}
+
+/* 4. Auth Overlay when Token is Missing or Invalid */
+#auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 17, 23, 0.96);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 100;
+}
+
+#auth-overlay.visible {
+  display: flex;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+}
+
+.auth-card h2 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+}
+
+.auth-card p {
+  margin: 0 0 16px 0;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.auth-card input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  margin-bottom: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.auth-card button {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-card button:active {
+  background: var(--accent-active);
+}

@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+# agy-remote: Helper CLI for Mobile Voice Control of agy (Wave 1)
+# Prints the Android login QR code + URL and attaches to the shared tmux session.
+
+set -euo pipefail
+
+export PATH="$HOME/.local/bin:$PATH"
+
+TMUX_BIN="$HOME/.local/bin/tmux"
+QRENCODE_BIN="$HOME/.local/bin/qrencode"
+AGY_BIN="$HOME/.local/bin/agy"
+TOKEN_FILE="$HOME/.config/agy-remote/token"
+PORT="${AGY_PORT:-7680}"
+SESSION="agy"
+
+ensure_token() {
+  mkdir -p "$(dirname "$TOKEN_FILE")"
+  if [[ ! -s "$TOKEN_FILE" ]]; then
+    od -An -N16 -tx1 /dev/urandom | tr -d ' \n' > "$TOKEN_FILE"
+    echo "" >> "$TOKEN_FILE"
+    chmod 600 "$TOKEN_FILE"
+  fi
+  tr -d '[:space:]' < "$TOKEN_FILE"
+}
+
+detect_lan_ip() {
+  local ip=""
+  ip=$(ip -4 -o addr show dev enp0s25 2>/dev/null | awk '{print $4}' | cut -d/ -f1 | head -n1 || true)
+  if [[ -z "$ip" ]]; then
+    ip=$(hostname -I 2>/dev/null | awk '{print $1}' || true)
+  fi
+  echo "${ip:-192.168.1.112}"
+}
+
+print_qr_and_url() {
+  local token
+  token="$(ensure_token)"
+  local ip
+  ip="$(detect_lan_ip)"
+  local url="http://${ip}:${PORT}/?token=${token}"
+
+  echo ""
+  echo "=================================================================="
+  echo "  📱 agy Mobile Voice Companion (Single-Origin Go Server :${PORT})"
+  echo "=================================================================="
+  echo "  Scan this QR code with your Android camera to connect Chrome:"
+  echo ""
+  if [[ -x "$QRENCODE_BIN" ]]; then
+    "$QRENCODE_BIN" -t ansiutf8 -m 2 "$url"
+  else
+    echo "  [qrencode not found]"
+  fi
+  echo ""
+  echo "  Direct URL:  $url"
+  echo "  GCP Project: evolvere-iot-poc (auth_method: gcp)"
+  echo "=================================================================="
+  echo ""
+}
+
+ensure_services() {
+  if systemctl --user is-active --quiet agy-voice-ui.service && \
+     systemctl --user is-active --quiet agy-ttyd.service; then
+    return 0
+  fi
+  systemctl --user start agy-tmux.service agy-ttyd.service agy-voice-ui.service 2>/dev/null || true
+}
+
+ensure_tmux_session() {
+  if ! "$TMUX_BIN" has-session -t "$SESSION" 2>/dev/null; then
+    "$TMUX_BIN" new-session -d -s "$SESSION" -c "$PWD" "while true; do $AGY_BIN; sleep 1; done"
+  fi
+  "$TMUX_BIN" set-option -g mouse on 2>/dev/null || true
+  "$TMUX_BIN" set-option -t "$SESSION" mouse on 2>/dev/null || true
+}
+
+cmd="${1:-attach}"
+
+case "$cmd" in
+  qr|--qr|url|--url)
+    print_qr_and_url
+    ;;
+  status|--status)
+    print_qr_and_url
+    systemctl --user --no-pager status agy-tmux.service agy-ttyd.service agy-voice-ui.service || true
+    ;;
+  restart|--restart)
+    systemctl --user daemon-reload
+    systemctl --user restart agy-tmux.service agy-ttyd.service agy-voice-ui.service
+    echo "Restarted agy-tmux, agy-ttyd, and agy-voice-ui services."
+    print_qr_and_url
+    ;;
+  new-token|--new-token)
+    rm -f "$TOKEN_FILE"
+    ensure_token >/dev/null
+    echo "Generated new access token in $TOKEN_FILE."
+    print_qr_and_url
+    ;;
+  attach|--attach|--now|"")
+    ensure_services
+    ensure_tmux_session
+    print_qr_and_url
+    if [[ -t 0 && -t 1 ]]; then
+      echo "  Tip: Both your PC and phone share the same '$SESSION' tmux session."
+      echo "       Inside tmux, press Ctrl+B then D to detach without stopping agy."
+      echo ""
+      if [[ "${1:-}" != "--now" && "${AGY_NO_PROMPT:-0}" != "1" ]]; then
+        read -r -p "  Press [Enter] to attach to the shared agy session (or Ctrl+C to cancel)... " _
+      fi
+      exec "$TMUX_BIN" attach-session -t "$SESSION"
+    fi
+    ;;
+  *)
+    echo "Usage: agy-remote [attach|--now|qr|status|restart|new-token]"
+    exit 1
+    ;;
+esac

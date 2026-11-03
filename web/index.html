@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, interactive-widget=resizes-content">
+  <meta name="theme-color" content="#0d1117">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="/style.css">
+  <title>agy Voice Remote</title>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="top-left">
+      <select class="folder-select" id="folder-select" aria-label="Select working folder" title="Select working folder for agy">
+        <option value="">📁 ~ (Home)</option>
+      </select>
+      <button class="top-btn restart-btn" id="restart-btn" type="button" title="Restart agy tmux session">⟳ Reset</button>
+    </div>
+    <div class="top-actions">
+      <button class="top-btn interrupt-btn" id="interrupt-btn" type="button" title="Interrupt running turn (Esc)">Interrupt</button>
+      <button class="top-btn send-now-btn" id="send-now-btn" type="button" title="Send input now (or Enter)">Send Now</button>
+      <button class="top-btn clear-btn" id="clear-conv-btn" type="button" title="Send /clear to agy">/clear</button>
+    </div>
+  </header>
+
+  <main class="terminal-wrap" id="terminal-wrap">
+    <iframe id="ttyd-frame" src="about:blank" allow="clipboard-read; clipboard-write"></iframe>
+    <button id="scroll-bottom-btn" class="scroll-bottom-btn" type="button" aria-label="Scroll to bottom" title="Scroll to bottom">↓ Bottom</button>
+    <div id="toast" class="toast"></div>
+  </main>
+
+  <nav class="nav-bar" aria-label="Terminal Navigation">
+    <button class="nav-btn slash-btn" id="btn-slash" type="button" aria-label="Slash /" title="Type / or open slash commands">/</button>
+    <button class="nav-btn tab-btn" id="btn-tab" type="button" aria-label="Tab / Autocomplete" title="Tab / Autocomplete">tab</button>
+    <button class="nav-btn esc-btn" id="btn-esc" type="button" aria-label="Escape" title="Escape / Cancel">esc</button>
+    <button class="nav-btn arrow-btn" id="btn-left" type="button" aria-label="Left Arrow" title="Left">←</button>
+    <button class="nav-btn arrow-btn" id="btn-up" type="button" aria-label="Up Arrow" title="Up">↑</button>
+    <button class="nav-btn arrow-btn" id="btn-down" type="button" aria-label="Down Arrow" title="Down">↓</button>
+    <button class="nav-btn arrow-btn" id="btn-right" type="button" aria-label="Right Arrow" title="Right">→</button>
+    <button class="nav-btn enter-btn" id="btn-enter" type="button" aria-label="Return" title="Return (Enter)">↵</button>
+  </nav>
+
+  <div id="auth-overlay">
+    <div class="auth-card">
+      <h2>🔒 agy Voice Remote</h2>
+      <p>Scan the QR code from <code>agy-remote</code> on your PC, or paste your access token below:</p>
+      <input id="token-input" type="password" placeholder="Access token..." autocomplete="off">
+      <button id="token-save-btn" type="button">Connect</button>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
